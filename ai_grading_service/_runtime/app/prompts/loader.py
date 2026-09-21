@@ -69,14 +69,20 @@ PROMPT_REGISTRY: dict[str, PromptSpec] = {
     "question_image_parser": PromptSpec(
         stage_type="question_image_parser",
         prompt_name="question_image_parser",
-        prompt_version="v2.6",
-        filename="v2.6/question_generation/image_parser.md",
+        prompt_version="v2.6.1",
+        filename="v2.6.1/question_generation/image_parser.md",
     ),
     "question_config_generator": PromptSpec(
         stage_type="question_config_generator",
         prompt_name="question_config_generator",
-        prompt_version="v2.6",
-        filename="v2.6/question_generation/config_generator.md",
+        prompt_version="v2.6.1",
+        filename="v2.6.1/question_generation/config_generator.md",
+    ),
+    "question_output_formatter": PromptSpec(
+        stage_type="question_output_formatter",
+        prompt_name="question_output_formatter",
+        prompt_version="v2.6.1",
+        filename="v2.6.1/question_generation/output_formatter.md",
     ),
 }
 

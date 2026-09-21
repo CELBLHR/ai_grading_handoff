@@ -20,4 +20,4 @@ __all__ = [
     "generate_question_from_image",
     "generate_question_from_text",
 ]
-__version__ = "2.6"
+__version__ = "2.6.1"

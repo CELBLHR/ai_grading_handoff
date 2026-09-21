@@ -43,6 +43,7 @@ class OpenAICompatibleProvider:
         self.prompts = {
             "question_image_parser": load_prompt("question_image_parser"),
             "question_config_generator": load_prompt("question_config_generator"),
+            "question_output_formatter": load_prompt("question_output_formatter"),
             "visual_ocr": load_prompt("visual_ocr"),
             "evidence_risk": load_prompt("evidence_risk"),
             "method_analysis": load_prompt("method_analysis"),
@@ -135,6 +136,35 @@ class OpenAICompatibleProvider:
         return self.call_stage_json(
             context=context,
             stage_type="question_config_generator",
+            endpoint=self.config.grading,
+            messages=messages,
+        )
+
+    def run_question_output_formatter(self, context: dict[str, Any]) -> ProviderResponse:
+        """
+        功能：对题目配置最终响应执行一次受限格式修复，不重新求解题目。
+
+        参数：
+            context (dict[str, Any]): 包含 original_output 和 validation_issues 的修复上下文。
+
+        返回：
+            ProviderResponse: 修复后的完整题目配置及模型审计信息。
+        """
+        user_payload = {
+            "prompt": self.prompts["question_output_formatter"],
+            "validation_issues": context["validation_issues"],
+            "original_output": context["original_output"],
+        }
+        messages = [
+            {
+                "role": "system",
+                "content": "你是数学题目配置格式质量修复器。只修复格式，不改变任何数学含义或业务结构。",
+            },
+            {"role": "user", "content": json.dumps(user_payload, ensure_ascii=False)},
+        ]
+        return self.call_stage_json(
+            context=context,
+            stage_type="question_output_formatter",
             endpoint=self.config.grading,
             messages=messages,
         )

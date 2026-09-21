@@ -115,7 +115,7 @@ class MockModelProvider:
             return supplied_output
 
         return {
-            "question_title": "Mock 题目",
+            "question_title": "基础加法计算",
             "question_content": "计算 $1+1$。",
             "question_type": "calculation",
             "question_type_confidence": "high",
@@ -135,7 +135,7 @@ class MockModelProvider:
             context (dict[str, Any]): 包含题干、已有内容、业务类型和允许生成字段的上下文。
 
         返回：
-            dict[str, Any]: 可通过 v2.6 题目生成契约校验的 mock 结果。
+            dict[str, Any]: 可通过 v2.6.1 题目生成契约校验的 mock 结果。
         """
         question = context.get("question", {})
         existing_content = context.get("existing_content", {})
@@ -144,7 +144,7 @@ class MockModelProvider:
 
         standard_answers = list(existing_content.get("standard_answers") or [])
         if "standard_answers" in allowed_fields:
-            standard_answers = ["2"]
+            standard_answers = ["$2$"]
 
         scoring_paths = list(existing_content.get("scoring_paths") or [])
         if "scoring_paths" in allowed_fields and max_score is not None:
@@ -177,7 +177,7 @@ class MockModelProvider:
         raw_confidence = str(question.get("question_type_confidence") or "").strip()
         inferred_confidence = "high" if raw_question_type in {"", "unknown"} else raw_confidence or "high"
         return {
-            "question_title": str(question.get("question_title") or "Mock 题目"),
+            "question_title": str(question.get("question_title") or "基础加法计算"),
             "question_type": inferred_question_type,
             "question_type_confidence": inferred_confidence,
             "standard_answers": standard_answers,
@@ -185,6 +185,19 @@ class MockModelProvider:
             "scoring_paths": scoring_paths,
             "warnings": [],
         }
+
+    def run_question_output_formatter(self, context: dict[str, Any]) -> dict[str, Any]:
+        """
+        功能：在 mock 模式返回原始最终响应，用于验证未修复内容会被质量门拒绝。
+
+        参数：
+            context (dict[str, Any]): 包含 original_output 的格式修复上下文。
+
+        返回：
+            dict[str, Any]: 原始最终响应的浅层副本。
+        """
+        # mock 不猜测数学语义；正常 mock 数据本身应合规，故只有异常测试数据会走到这里并被二次校验拒绝。
+        return dict(context.get("original_output") or {})
 
     def get_stage_model_name(self, stage_type: str) -> str:
         """

@@ -57,6 +57,17 @@ class ModelProvider(Protocol):
             dict[str, Any] | ProviderResponse: AI 生成的题目配置内容。
         """
 
+    def run_question_output_formatter(self, context: dict[str, Any]) -> dict[str, Any] | ProviderResponse:
+        """
+        功能：只修复题目配置最终响应中的 LaTeX 格式和名称类字段。
+
+        参数：
+            context (dict[str, Any]): 包含原始成功响应和精确校验问题的修复上下文。
+
+        返回：
+            dict[str, Any] | ProviderResponse: 完整且格式合规的题目配置响应。
+        """
+
     def run_visual_ocr(self, context: dict[str, Any]) -> dict[str, Any] | ProviderResponse:
         """
         功能：执行视觉 OCR 阶段。

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import re
 from copy import deepcopy
 from typing import Any
 from uuid import uuid4
@@ -9,6 +10,7 @@ from .grading_api import build_provider
 
 from app.pipelines.question_type import normalize_question_type
 from app.providers.base import unwrap_provider_response
+from app.providers.latex_quality import find_text_latex_issues
 
 
 ALLOWED_GRADING_MODES = {"exam", "homework"}
@@ -16,6 +18,28 @@ ALLOWED_CONTENT_MODES = {"stem_only", "solution_unannotated", "solution_annotate
 ALLOWED_CONFIDENCE_LEVELS = {"high", "medium", "low"}
 DEFAULT_EXAM_SCORE = 10.0
 SCORE_TOLERANCE = 1e-9
+
+# 题目正文比普通自然语言更容易出现短公式，因此补充共享检查器未覆盖的高置信度表达式模式。
+BARE_ARITHMETIC_PATTERN = re.compile(
+    r"(?<![A-Za-z0-9])(?:[A-Za-zΑ-Ωα-ω]|\d+(?:\.\d+)?)\s*[+\-−*/×÷]\s*"
+    r"(?:[A-Za-zΑ-Ωα-ω]|\d+(?:\.\d+)?)(?![A-Za-z0-9])"
+)
+BARE_FUNCTION_PATTERN = re.compile(r"(?<![A-Za-z])[A-Za-zΑ-Ωα-ω]+\s*\(\s*[A-Za-zΑ-Ωα-ω0-9]")
+BARE_SINGLE_VARIABLE_PATTERN = re.compile(r"(?<![A-Za-z])[A-Za-zΑ-Ωα-ω](?![A-Za-z])")
+UNICODE_SUPERSCRIPT_PATTERN = re.compile(r"[A-Za-zΑ-Ωα-ω0-9)\]}][⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]+")
+PLAIN_MATH_ANSWER_PATTERN = re.compile(
+    r"^[\sA-Za-zΑ-Ωα-ω0-9_^{},.()+\-−*/=<>≤≥×÷\\]+$"
+)
+FORMULA_FREE_LABEL_MARKER_PATTERN = re.compile(r"[$\\^_=<>≤≥∑∏∫√∞±×÷∂∇→⇒⇔]|[A-Za-zΑ-Ωα-ω]+\s*\(")
+
+QUESTION_TITLE_FALLBACKS = {
+    "calculation": "数学计算题",
+    "proof": "数学证明题",
+    "discussion": "数学讨论题",
+    "mixed": "综合数学题",
+    "fill_blank": "数学填空题",
+    "unknown": "数学题目",
+}
 
 
 def generate_question_from_image(payload: dict[str, Any]) -> dict[str, Any]:
@@ -128,7 +152,7 @@ def generate_question_from_image(payload: dict[str, Any]) -> dict[str, Any]:
         if answer_is_generated:
             warnings = merge_string_lists(warnings, ["截图中未发现可靠标准答案，已由 AI 自动生成。"])
 
-        return build_success_response(
+        success_response = build_success_response(
             grading_mode=context["grading_mode"],
             question_title=parser_output["question_title"],
             question_content=parser_output["question_content"],
@@ -143,6 +167,12 @@ def generate_question_from_image(payload: dict[str, Any]) -> dict[str, Any]:
             scoring_paths=scoring_paths,
             scoring_is_generated=scoring_is_generated if context["grading_mode"] == "exam" else None,
             warnings=warnings,
+            model_stages=model_stages,
+        )
+        return ensure_question_generation_output_quality(
+            provider=provider,
+            context=context,
+            response=success_response,
             model_stages=model_stages,
         )
     except Exception as exc:  # noqa: BLE001
@@ -197,11 +227,8 @@ def generate_question_from_text(payload: dict[str, Any]) -> dict[str, Any]:
             scoring_paths = []
             scoring_is_generated = None
 
-        question_title = normalize_question_title(
-            generated_output.get("question_title"),
-            context["question_content"],
-        )
         question_type = normalize_question_type(generated_output.get("question_type"))
+        question_title = normalize_question_title(generated_output.get("question_title"), question_type)
         question_type_confidence = normalize_confidence(generated_output.get("question_type_confidence"))
         model_stages = [
             build_model_stage(
@@ -210,7 +237,7 @@ def generate_question_from_text(payload: dict[str, Any]) -> dict[str, Any]:
                 raw_output_path=raw_output_path,
             )
         ]
-        return build_success_response(
+        success_response = build_success_response(
             grading_mode=context["grading_mode"],
             question_title=question_title,
             question_content=context["question_content"],
@@ -229,6 +256,12 @@ def generate_question_from_text(payload: dict[str, Any]) -> dict[str, Any]:
             scoring_paths=scoring_paths,
             scoring_is_generated=scoring_is_generated,
             warnings=normalize_string_list(generated_output.get("warnings")),
+            model_stages=model_stages,
+        )
+        return ensure_question_generation_output_quality(
+            provider=provider,
+            context=context,
+            response=success_response,
             model_stages=model_stages,
         )
     except Exception as exc:  # noqa: BLE001
@@ -386,10 +419,11 @@ def normalize_image_parser_output(output: Any) -> dict[str, Any]:
     if content_mode == "solution_annotated" and (not standard_answers or not scoring_paths):
         raise ValueError("solution_annotated 场景必须同时包含标准答案和评分路径")
 
+    question_type = normalize_question_type(output.get("question_type"))
     return {
-        "question_title": normalize_question_title(output.get("question_title"), question_content),
+        "question_title": normalize_question_title(output.get("question_title"), question_type),
         "question_content": question_content,
-        "question_type": normalize_question_type(output.get("question_type")),
+        "question_type": question_type,
         "question_type_confidence": normalize_confidence(output.get("question_type_confidence")),
         "detected_score": output.get("detected_score"),
         "content_mode": content_mode,
@@ -625,6 +659,338 @@ def build_success_response(
     }
 
 
+def ensure_question_generation_output_quality(
+    provider: Any,
+    context: dict[str, Any],
+    response: dict[str, Any],
+    model_stages: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """
+    功能：统一检查两个题目生成入口的最终响应，并在必要时最多调用模型修复一次。
+
+    参数：
+        provider (Any): 当前模型 provider，必须实现题目输出格式修复方法。
+        context (dict[str, Any]): 当前请求上下文，用于模型调用和审计落盘。
+        response (dict[str, Any]): 尚未通过质量门的完整成功响应。
+        model_stages (list[dict[str, Any]]): 已发生的模型调用审计列表。
+
+    返回：
+        dict[str, Any]: 已通过 LaTeX 与名称类字段检查的完整成功响应。
+    """
+    quality_issues = find_question_generation_quality_issues(response)
+    if not quality_issues:
+        return response
+
+    repair_context = {
+        "project_id": context["project_id"],
+        "id": context["id"],
+        "question": {"id": context["id"]},
+        "original_output": deepcopy(response),
+        "validation_issues": quality_issues,
+    }
+    repair_response = provider.run_question_output_formatter(repair_context)
+    repaired_output, raw_output_path, model_name = unwrap_provider_response(provider, repair_response)
+    if not isinstance(repaired_output, dict):
+        raise ValueError("question_output_formatter 输出必须是完整 JSON 对象")
+
+    # 先验证业务结构完全不变，再只接收允许修改的展示文本，避免修复模型改动分值、ID 或来源状态。
+    if build_question_generation_structure_signature(response) != build_question_generation_structure_signature(
+        repaired_output
+    ):
+        raise ValueError("题目配置格式修复改变了答案数量、评分结构或业务状态")
+    merged_response = merge_repaired_display_texts(response, repaired_output)
+    merged_response = apply_formula_free_label_fallbacks(merged_response)
+
+    remaining_issues = find_question_generation_quality_issues(merged_response)
+    if remaining_issues:
+        issue_summary = "；".join(remaining_issues[:10])
+        raise ValueError(f"题目配置中的数学表达式仍不满足 LaTeX 要求：{issue_summary}")
+
+    model_stages.append(
+        build_model_stage(
+            stage_type="question_output_formatter",
+            model_name=model_name,
+            raw_output_path=raw_output_path,
+        )
+    )
+    # 调用次数只由程序依据真实调用记录重建，不接受修复模型回写的审计值。
+    merged_response["model_stages"] = model_stages
+    merged_response["model_call_count"] = len(model_stages)
+    return merged_response
+
+
+def find_question_generation_quality_issues(output: dict[str, Any]) -> list[str]:
+    """
+    功能：检查题目配置中的裸公式、定界符错误，以及名称类字段中的公式。
+
+    参数：
+        output (dict[str, Any]): 两个公开方法组装出的完整成功响应。
+
+    返回：
+        list[str]: 带字段路径的质量问题；空列表表示检查通过。
+    """
+    issues: list[str] = []
+    for field_path, text_value, strict_answer in iter_question_generation_math_texts(output):
+        text_issues = find_question_text_latex_issues(text_value, strict_answer=strict_answer)
+        if text_issues:
+            issues.append(f"{field_path}: {', '.join(text_issues)}")
+        if len(issues) >= 50:
+            return issues
+
+    question_title = str(output.get("question_title") or "")
+    if not is_formula_free_label(question_title, max_length=30):
+        issues.append("question_title: 必须是简短且不含公式的自然语言标题")
+
+    scoring_paths = output.get("scoring_paths")
+    if isinstance(scoring_paths, list):
+        for path_index, scoring_path in enumerate(scoring_paths):
+            if not isinstance(scoring_path, dict):
+                continue
+            path_name = str(scoring_path.get("name") or "")
+            if not is_formula_free_label(path_name, max_length=30):
+                issues.append(f"scoring_paths[{path_index}].name: 必须是不含公式的自然语言名称")
+    return issues[:50]
+
+
+def iter_question_generation_math_texts(output: dict[str, Any]) -> list[tuple[str, str, bool]]:
+    """
+    功能：按白名单提取题目配置中允许出现数学表达式的展示字段。
+
+    参数：
+        output (dict[str, Any]): 完整题目配置响应。
+
+    返回：
+        list[tuple[str, str, bool]]: 字段路径、文本及是否按标准答案严格检查组成的列表。
+    """
+    display_texts: list[tuple[str, str, bool]] = []
+    for field_name in ("question_content", "solution_text"):
+        field_value = output.get(field_name)
+        if isinstance(field_value, str) and field_value:
+            display_texts.append((field_name, field_value, False))
+
+    for answer_index, answer_value in enumerate(output.get("standard_answers") or []):
+        if isinstance(answer_value, str) and answer_value:
+            display_texts.append((f"standard_answers[{answer_index}]", answer_value, True))
+    for warning_index, warning_value in enumerate(output.get("warnings") or []):
+        if isinstance(warning_value, str) and warning_value:
+            display_texts.append((f"warnings[{warning_index}]", warning_value, False))
+
+    for path_index, scoring_path in enumerate(output.get("scoring_paths") or []):
+        if not isinstance(scoring_path, dict):
+            continue
+        for field_name in ("reference_solution", "applicability"):
+            field_value = scoring_path.get(field_name)
+            if isinstance(field_value, str) and field_value:
+                display_texts.append((f"scoring_paths[{path_index}].{field_name}", field_value, False))
+        for point_index, point in enumerate(scoring_path.get("points") or []):
+            if isinstance(point, dict) and isinstance(point.get("description"), str):
+                display_texts.append(
+                    (
+                        f"scoring_paths[{path_index}].points[{point_index}].description",
+                        point["description"],
+                        False,
+                    )
+                )
+    return display_texts
+
+
+def find_question_text_latex_issues(text: str, strict_answer: bool = False) -> list[str]:
+    """
+    功能：在共享 LaTeX 检查基础上补充题目领域中的算式、函数和短答案检查。
+
+    参数：
+        text (str): 待检查文本。
+        strict_answer (bool): 是否把纯数字或纯数学字符答案也视为必须包裹的公式。
+
+    返回：
+        list[str]: 当前文本命中的去重问题类型。
+    """
+    issues = list(find_text_latex_issues(text))
+    outside_text = remove_latex_segments_for_question_check(text)
+    if BARE_ARITHMETIC_PATTERN.search(outside_text):
+        issues.append("算式未放入公式定界符")
+    if BARE_FUNCTION_PATTERN.search(outside_text):
+        issues.append("函数表达式未放入公式定界符")
+    if UNICODE_SUPERSCRIPT_PATTERN.search(outside_text):
+        issues.append("Unicode 上标表达式未放入公式定界符")
+    if BARE_SINGLE_VARIABLE_PATTERN.search(outside_text):
+        issues.append("单独变量未放入公式定界符")
+    if strict_answer and "$" not in text and PLAIN_MATH_ANSWER_PATTERN.fullmatch(text.strip()):
+        issues.append("数学答案未放入公式定界符")
+    return list(dict.fromkeys(issues))
+
+
+def remove_latex_segments_for_question_check(text: str) -> str:
+    """
+    功能：用空格替换已正确包裹的公式，供题目领域的补充正则只检查公式外文本。
+
+    参数：
+        text (str): 可能同时包含自然语言和公式的展示文本。
+
+    返回：
+        str: 已移除 `$...$` 与 `$$...$$` 内容的普通文本。
+    """
+    characters: list[str] = []
+    delimiter = ""
+    index = 0
+    while index < len(text):
+        if not delimiter and text.startswith("$$", index):
+            delimiter = "$$"
+            index += 2
+            continue
+        if not delimiter and text[index] == "$":
+            delimiter = "$"
+            index += 1
+            continue
+        if delimiter and text.startswith(delimiter, index):
+            delimiter = ""
+            characters.append(" ")
+            index += 2 if text.startswith("$$", index) else 1
+            continue
+        if not delimiter:
+            characters.append(text[index])
+        index += 1
+    return "".join(characters)
+
+
+def is_formula_free_label(label: str, max_length: int) -> bool:
+    """
+    功能：判断标题或解法名称是否为简短、单行且不含明显公式的自然语言标签。
+
+    参数：
+        label (str): 待检查的名称类文本。
+        max_length (int): 允许的最大字符数。
+
+    返回：
+        bool: 满足名称字段要求时返回 True。
+    """
+    compact_label = label.strip()
+    if not compact_label or len(compact_label) > max_length or "\n" in compact_label or "\r" in compact_label:
+        return False
+    if FORMULA_FREE_LABEL_MARKER_PATTERN.search(compact_label):
+        return False
+    if BARE_SINGLE_VARIABLE_PATTERN.search(compact_label):
+        return False
+    if BARE_ARITHMETIC_PATTERN.search(compact_label) or UNICODE_SUPERSCRIPT_PATTERN.search(compact_label):
+        return False
+    return not find_text_latex_issues(compact_label)
+
+
+def build_formula_free_title_fallback(question_type: str) -> str:
+    """
+    功能：根据题型生成绝不包含公式的标题兜底，避免再次截取含公式题干。
+
+    参数：
+        question_type (str): 已规范化题型。
+
+    返回：
+        str: 可安全用于列表展示的自然语言标题。
+    """
+    return QUESTION_TITLE_FALLBACKS.get(question_type, QUESTION_TITLE_FALLBACKS["unknown"])
+
+
+def apply_formula_free_label_fallbacks(output: dict[str, Any]) -> dict[str, Any]:
+    """
+    功能：修复模型仍未改好的名称字段，并保证兜底过程不触碰正文数学内容。
+
+    参数：
+        output (dict[str, Any]): 已合并模型格式修复文本的响应。
+
+    返回：
+        dict[str, Any]: 标题和路径名称均不含公式的响应副本。
+    """
+    normalized_output = deepcopy(output)
+    if not is_formula_free_label(str(normalized_output.get("question_title") or ""), max_length=30):
+        normalized_output["question_title"] = build_formula_free_title_fallback(
+            str(normalized_output.get("question_type") or "unknown")
+        )
+    for path_index, scoring_path in enumerate(normalized_output.get("scoring_paths") or [], start=1):
+        if isinstance(scoring_path, dict) and not is_formula_free_label(
+            str(scoring_path.get("name") or ""), max_length=30
+        ):
+            scoring_path["name"] = f"解法 {path_index}"
+    return normalized_output
+
+
+def build_question_generation_structure_signature(output: dict[str, Any]) -> dict[str, Any]:
+    """
+    功能：提取格式修复前后必须保持不变的业务结构、分值、ID 和来源状态。
+
+    参数：
+        output (dict[str, Any]): 修复前或修复后的完整题目配置。
+
+    返回：
+        dict[str, Any]: 不包含允许修复的展示文本的结构签名。
+    """
+    path_signatures: list[dict[str, Any]] = []
+    for scoring_path in output.get("scoring_paths") or []:
+        if not isinstance(scoring_path, dict):
+            path_signatures.append({"invalid_path": True})
+            continue
+        point_signatures = []
+        for point in scoring_path.get("points") or []:
+            if isinstance(point, dict):
+                point_signatures.append({"id": point.get("id"), "score": point.get("score")})
+            else:
+                point_signatures.append({"invalid_point": True})
+        path_signatures.append({"id": scoring_path.get("id"), "points": point_signatures})
+
+    protected_fields = (
+        "status",
+        "grading_mode",
+        "question_type",
+        "question_type_source",
+        "question_type_confidence",
+        "score",
+        "score_source",
+        "content_mode",
+        "is_answer_ai_generated",
+        "answer_source",
+        "is_scoring_paths_ai_generated",
+        "scoring_paths_source",
+        "model_call_count",
+        "model_stages",
+    )
+    return {
+        "top_level_keys": sorted(output.keys()),
+        "protected_fields": {field_name: output.get(field_name) for field_name in protected_fields},
+        "standard_answer_count": len(output.get("standard_answers") or []),
+        "warning_count": len(output.get("warnings") or []),
+        "scoring_paths": path_signatures,
+    }
+
+
+def merge_repaired_display_texts(
+    original_output: dict[str, Any],
+    repaired_output: dict[str, Any],
+) -> dict[str, Any]:
+    """
+    功能：仅从修复结果接收允许变化的展示文本，其余业务字段始终保留原值。
+
+    参数：
+        original_output (dict[str, Any]): 修复前的可信业务响应。
+        repaired_output (dict[str, Any]): 已通过结构签名检查的模型修复结果。
+
+    返回：
+        dict[str, Any]: 业务结构来自原响应、展示文本来自修复响应的安全合并结果。
+    """
+    merged_output = deepcopy(original_output)
+    for field_name in ("question_title", "question_content", "solution_text"):
+        merged_output[field_name] = str(repaired_output.get(field_name) or "").strip()
+    merged_output["standard_answers"] = [str(value).strip() for value in repaired_output["standard_answers"]]
+    merged_output["warnings"] = [str(value).strip() for value in repaired_output["warnings"]]
+
+    for path_index, repaired_path in enumerate(repaired_output["scoring_paths"]):
+        merged_path = merged_output["scoring_paths"][path_index]
+        for field_name in ("name", "reference_solution", "applicability"):
+            merged_path[field_name] = str(repaired_path.get(field_name) or "").strip()
+        for point_index, repaired_point in enumerate(repaired_path.get("points") or []):
+            merged_path["points"][point_index]["description"] = str(
+                repaired_point.get("description") or ""
+            ).strip()
+    return merged_output
+
+
 def build_failed_response(payload: Any, exc: Exception) -> dict[str, Any]:
     """
     功能：构造题目生成失败时的稳定返回结构，避免调用方解析异常形态。
@@ -770,13 +1136,13 @@ def merge_string_lists(*value_lists: list[str]) -> list[str]:
     return merged
 
 
-def normalize_question_title(raw_title: Any, question_content: str) -> str:
+def normalize_question_title(raw_title: Any, question_type: str) -> str:
     """
-    功能：优先使用模型标题，缺失时从题干截取简短且稳定的兜底标题。
+    功能：优先保留模型标题，缺失时根据题型生成不含公式的稳定兜底标题。
 
     参数：
         raw_title (Any): 模型生成或识别的标题。
-        question_content (str): 已确认非空的完整题干。
+        question_type (str): 已规范化的建议题型。
 
     返回：
         str: 非空题目标题。
@@ -784,8 +1150,7 @@ def normalize_question_title(raw_title: Any, question_content: str) -> str:
     title = str(raw_title or "").strip()
     if title:
         return title
-    compact_content = " ".join(question_content.split())
-    return compact_content[:30] + ("…" if len(compact_content) > 30 else "")
+    return build_formula_free_title_fallback(question_type)
 
 
 def normalize_confidence(raw_confidence: Any) -> str:
