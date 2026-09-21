@@ -1,0 +1,26 @@
+{
+  "answer_item_id": "answer_demo_001",
+  "status": "failed",
+  "suggested_score": null,
+  "max_score": null,
+  "final_score": null,
+  "selected_path_id": null,
+  "summary": "",
+  "score_points": [],
+  "deductions": [],
+  "confidence_level": "low",
+  "review_advice": "required_review",
+  "risk_tags": [
+    "ai_grading_failed"
+  ],
+  "review_focus": [
+    "查看 AI 批改错误信息，并人工复核该题。"
+  ],
+  "evidence_safe": false,
+  "stage_outputs": {},
+  "stage_results": [],
+  "error": {
+    "code": "ValueError",
+    "message": "错误原因"
+  }
+}

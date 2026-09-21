@@ -1,0 +1,35 @@
+{
+  "answer_item_id": "homework_answer_001",
+  "status": "success",
+  "grading_mode": "homework",
+  "suggested_score": null,
+  "max_score": null,
+  "final_score": null,
+  "question_type": "calculation",
+  "selected_path_id": null,
+  "summary": "作答过程与结论和参考答案一致，当前未发现明确错误。",
+  "score_points": [],
+  "deductions": [],
+  "homework_feedback": {
+    "answer_status": "correct",
+    "summary": "作答过程与结论和参考答案一致，当前未发现明确错误。",
+    "strengths": [
+      "能够给出与参考答案一致的过程或结论。"
+    ],
+    "issues": [],
+    "improvement_suggestions": [],
+    "evidence_usage": {}
+  },
+  "confidence_level": "high",
+  "review_advice": "auto_accept",
+  "risk_tags": [],
+  "review_focus": [],
+  "evidence_safe": true,
+  "homework_review_mode": "off",
+  "homework_review_status": "not_run",
+  "stage_outputs": {
+    "homework_review_decision": null
+  },
+  "stage_results": [],
+  "error": null
+}

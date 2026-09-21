@@ -1,0 +1,5 @@
+{
+  "grading_mode": "exam",
+  "question_content": "设 $f(x,y,z)=x^y+y^z$，求 $f_y(1,2,3)$。",
+  "score": 10
+}

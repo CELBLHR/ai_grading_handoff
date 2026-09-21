@@ -1,0 +1,48 @@
+{
+  "project_id": "external_project_demo",
+  "run_id": "method_cluster_run_demo",
+  "question": {
+    "question_id": "question_demo_001",
+    "question_no": "1",
+    "question_type": "calculation",
+    "stem": "计算 1 + 1 的结果，并写出过程。",
+    "standard_answer": "1 + 1 = 2",
+    "max_score": 2,
+    "rubric": {
+      "type": "calculation",
+      "scoring_points": [
+        {
+          "id": "p1",
+          "description": "写出正确计算过程",
+          "score": 1
+        },
+        {
+          "id": "p2",
+          "description": "得到正确答案 2",
+          "score": 1
+        }
+      ]
+    }
+  },
+  "current_rubric": {
+    "type": "calculation",
+    "scoring_points": []
+  },
+  "method_pool": [
+    {
+      "answer_item_id": "answer_demo_001",
+      "student_no": "20260001",
+      "suggested_score": 2,
+      "method_summary": "学生直接进行加法运算，写出等式 1 + 1 = 2 得到结果。"
+    },
+    {
+      "answer_item_id": "answer_demo_002",
+      "student_no": "20260002",
+      "suggested_score": 1,
+      "method_summary": "学生写出加法思路，但最终结果书写不完整。"
+    }
+  ],
+  "threshold": {
+    "min_cluster_count": 2
+  }
+}

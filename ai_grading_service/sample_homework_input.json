@@ -1,0 +1,24 @@
+{
+  "project_id": "homework_project_demo",
+  "task_id": "homework_task_demo",
+  "pipeline_run_id": "homework_run_demo",
+  "answer_item_id": "homework_answer_001",
+  "student": {
+    "student_id": "student_demo_001",
+    "student_no": "20260001",
+    "name": "张三"
+  },
+  "question": {
+    "question_id": "homework_question_001",
+    "question_no": "1",
+    "question_type": "calculation",
+    "stem": "计算 1 + 1 的结果，并写出过程。",
+    "standard_answer": "1 + 1 = 2"
+  },
+  "student_answer": {
+    "image_path": "",
+    "image_url": "",
+    "ocr_text": "",
+    "text": "1 + 1 = 2"
+  }
+}

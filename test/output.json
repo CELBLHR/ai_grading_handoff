@@ -1,0 +1,330 @@
+{
+    "error": null,
+    "status": "success",
+    "summary": "学生采用标准特征方程法。特征方程、行列式展开及两个特征值均正确。$\\lambda_1=1$ 的化简和特征向量清晰正确，但 $\\lambda_2=3$ 的后续化简式与特征向量区域因影像遮挡无法确认。按 v2.3 二值评分规则，未完整命中的评分点不给部分分。",
+    "max_score": 10.0,
+    "risk_tags": [
+        "关键步骤遮挡",
+        "最终答案不清",
+        "公式转写存疑",
+        "关键符号存疑"
+    ],
+    "deductions": [],
+    "final_score": null,
+    "selected_path_id": null,
+    "review_focus": [
+        "请核对 block_10 中 $\\lambda_2=3$ 的方程组化简区域，确认被遮挡处是否为 $x_1-x_2=0$ 或等价式，并检查等号、右端零向量是否可辨认。",
+        "请核对 block_11 底部被像素遮挡的特征向量区域，确认是否存在 $\\lambda_2=3$ 对应的特征向量 $k(1,1)^T\\ (k\\neq 0)$ 及其完整表达式。",
+        "请判断 block_11 中 $\\text{[unrecognizable]}^T\\ \\text{[unrecognizable]}, 5)$ 是否为学生笔迹碎片或卷面干扰，不要把模糊内容直接解释为有效数学符号。"
+    ],
+    "score_points": [
+        {
+            "score": 3,
+            "point_id": "0",
+            "rationale": "正确写出特征方程 $|\\lambda I-A|=0$，并将行列式展开为 $(\\lambda-2)^2-1=0$，解得 $\\lambda_1=1$、$\\lambda_2=3$。"
+        },
+        {
+            "score": 0,
+            "point_id": "1",
+            "rationale": "该评分点要求分别将 $\\lambda=1$ 和 $\\lambda=3$ 代入并正确化简方程。$\\lambda_1=1$ 部分清晰正确，但 $\\lambda_2=3$ 后续化简式 OCR 显示不完整；按 v2.3 二值评分规则，该评分点未完整命中，给 0 分。"
+        },
+        {
+            "score": 0,
+            "point_id": "2",
+            "rationale": "该评分点要求正确写出全部对应特征向量。$\\lambda_1=1$ 对应的特征向量 $k(1,-1)^T\\ (k\\neq 0)$ 正确，但 $\\lambda_2=3$ 对应的特征向量区域被遮挡，无法确认完整形式；按 v2.3 二值评分规则，该评分点未完整命中，给 0 分。"
+        }
+    ],
+    "evidence_safe": false,
+    "question_type": "calculation",
+    "review_advice": "required_review",
+    "stage_outputs": {
+        "scoring": {
+            "summary": "学生采用标准特征方程法。特征方程、行列式展开及两个特征值均正确。$\\lambda_1=1$ 的化简和特征向量清晰正确，但 $\\lambda_2=3$ 的后续化简式与特征向量区域因影像遮挡无法确认。按 v2.3 二值评分规则，未完整命中的评分点不给部分分。",
+            "max_score": 10.0,
+            "deductions": [],
+            "score_points": [
+                {
+                    "score": 3,
+                    "point_id": "0",
+                    "rationale": "正确写出特征方程 $|\\lambda I-A|=0$，并将行列式展开为 $(\\lambda-2)^2-1=0$，解得 $\\lambda_1=1$、$\\lambda_2=3$。"
+                },
+                {
+                    "score": 0,
+                    "point_id": "1",
+                    "rationale": "该评分点要求分别将 $\\lambda=1$ 和 $\\lambda=3$ 代入并正确化简方程。$\\lambda_1=1$ 部分清晰正确，但 $\\lambda_2=3$ 后续化简式 OCR 显示不完整；按 v2.3 二值评分规则，该评分点未完整命中，给 0 分。"
+                },
+                {
+                    "score": 0,
+                    "point_id": "2",
+                    "rationale": "该评分点要求正确写出全部对应特征向量。$\\lambda_1=1$ 对应的特征向量 $k(1,-1)^T\\ (k\\neq 0)$ 正确，但 $\\lambda_2=3$ 对应的特征向量区域被遮挡，无法确认完整形式；按 v2.3 二值评分规则，该评分点未完整命中，给 0 分。"
+                }
+            ],
+            "evidence_usage": {
+                "used_evidence_risks": [
+                    "block_10 中 $\\lambda_2=3$ 的化简式被遮挡，无法确认是否完整写为 $x_1-x_2=0$。",
+                    "block_11 中 $\\lambda_2=3$ 的特征向量结果被遮挡，无法确认是否为 $k(1,1)^T\\ (k\\neq 0)$。"
+                ],
+                "uncertain_but_scored_conservatively": [
+                    "$\\lambda_2=3$ 的化简证据不完整，按 v2.3 二值评分规则未完整命中该评分点，给 0 分。",
+                    "$\\lambda_2=3$ 的特征向量未因可能存在的模糊答案而加分；按 v2.3 二值评分规则未完整命中该评分点，给 0 分。"
+                ]
+            },
+            "selected_path_id": null,
+            "suggested_score": 3.0,
+            "final_answer_status": "partially_correct",
+            "mathematical_review": {
+                "logic_status": "mostly_complete",
+                "method_validity": "valid",
+                "final_answer_equivalence": "possibly_equivalent_due_to_ocr"
+            }
+        },
+        "visual_ocr": {
+            "ocr_risk": {
+                "anomalies": "$\\lambda_2 = 3$ 对应的后续求解步骤和结果被像素遮挡模糊，无法识别完整内容",
+                "visual_anomalies": [
+                    "页面底部内容存在像素遮挡模糊"
+                ],
+                "uncertain_regions": [
+                    "block_10",
+                    "block_11"
+                ],
+                "final_answer_candidates": []
+            },
+            "transcription": {
+                "blocks": [
+                    {
+                        "text": "求特征值:\n由特征方程 $|\\lambda I - A| = 0$，得:\n$$|\\lambda I - A| = \\begin{vmatrix}\\lambda - 2 & -1 \\\\-1 & \\lambda - 2\\end{vmatrix} = (\\lambda - 2)^2 - 1 = 0$$",
+                        "block_id": "block_1",
+                        "visual_note": "页面上方解题起始区域",
+                        "visual_status": "normal"
+                    },
+                    {
+                        "text": "$(\\lambda - 2)^2 = 1$",
+                        "block_id": "block_2",
+                        "visual_note": "特征方程化简步骤区域",
+                        "visual_status": "normal"
+                    },
+                    {
+                        "text": "$\\lambda - 2 = \\pm 1$",
+                        "block_id": "block_3",
+                        "visual_note": "开方步骤区域",
+                        "visual_status": "normal"
+                    },
+                    {
+                        "text": "$\\lambda_1 = 1, \\lambda_2 = 3$",
+                        "block_id": "block_4",
+                        "visual_note": "特征值求解结果区域",
+                        "visual_status": "normal"
+                    },
+                    {
+                        "text": "求特征向量:",
+                        "block_id": "block_5",
+                        "visual_note": "特征向量求解起始区域",
+                        "visual_status": "normal"
+                    },
+                    {
+                        "text": "当 $\\lambda_1 = 1$ 时:\n$(\\lambda I - A)x = 0$，即 $\\begin{pmatrix}-1 & -1 \\\\-1 & -1\\end{pmatrix}\\begin{pmatrix}x_1 \\\\x_2\\end{pmatrix} = \\begin{pmatrix}0 \\\\0\\end{pmatrix}$",
+                        "block_id": "block_6",
+                        "visual_note": "$\\lambda_1=1$代入特征方程区域",
+                        "visual_status": "normal"
+                    },
+                    {
+                        "text": "得 $-x_1 - x_2 = 0$，即 $x_1 = -x_2$",
+                        "block_id": "block_7",
+                        "visual_note": "化简线性方程组步骤区域",
+                        "visual_status": "normal"
+                    },
+                    {
+                        "text": "令 $x_2 = k$，则 $x_1 = -k$，特征向量为 $k(1, -1)^T\\ (k \\neq 0)$",
+                        "block_id": "block_8",
+                        "visual_note": "$\\lambda_1=1$对应的特征向量结果区域",
+                        "visual_status": "normal"
+                    },
+                    {
+                        "text": "当 $\\lambda_2 = 3$ 时:\n$(\\lambda I - A)x = 0$，即 $\\begin{pmatrix}1 & -1 \\\\-1 & 1\\end{pmatrix}\\begin{pmatrix}x_1 \\\\x_2\\end{pmatrix} = \\begin{pmatrix}0 \\\\0\\end{pmatrix}$",
+                        "block_id": "block_9",
+                        "visual_note": "$\\lambda_2=3$代入特征方程区域",
+                        "visual_status": "normal"
+                    },
+                    {
+                        "text": "$x_1 - x_2 - [unrecognizable]$",
+                        "block_id": "block_10",
+                        "visual_note": "页面中下部，$\\lambda_2=3$对应的线性方程组化简区域，内容被像素遮挡，大部分模糊",
+                        "visual_status": "unclear"
+                    },
+                    {
+                        "text": "$\\text{[unrecognizable]}^T\\ \\text{[unrecognizable]}, 5)$",
+                        "block_id": "block_11",
+                        "visual_note": "页面最底部，$\\lambda_2=3$对应的特征向量结果区域，内容被像素严重遮挡，几乎无法识别",
+                        "visual_status": "unclear"
+                    }
+                ],
+                "metadata": {
+                    "image_clarity": "high",
+                    "has_overlapping_text": false,
+                    "reading_order_difficulty": "low"
+                },
+                "question_area": {
+                    "stem_text": ""
+                },
+                "final_answer_candidates": [
+                    {
+                        "text": "$\\lambda_1 = 1, \\lambda_2 = 3$",
+                        "blank_index": 1,
+                        "position_note": "特征值求解结果区域",
+                        "visual_status": "normal",
+                        "source_block_id": "block_4"
+                    },
+                    {
+                        "text": "$k(1, -1)^T\\ (k \\neq 0)$",
+                        "blank_index": 2,
+                        "position_note": "$\\lambda_1 = 1$ 对应的特征向量结果区域",
+                        "visual_status": "normal",
+                        "source_block_id": "block_8"
+                    }
+                ]
+            },
+            "normalized_input": {
+                "image_url": "",
+                "image_path": "C:\\Users\\zzkk0\\AppData\\Local\\Temp\\tmpnh3th2rw.png",
+                "student_answer_text": "求特征值：\n由特征方程 $|\\lambda I - A| = 0$，得:\n$|\\lambda I - A| = \\begin{vmatrix}\\lambda - 2 & -1 \\\\-1 & \\lambda - 2\\end{vmatrix} = (\\lambda - 2)^2 - 1 = 0$\n$(\\lambda - 2)^2 = 1$\n$\\lambda - 2 = \\pm 1$\n$\\lambda_1 = 1, \\lambda_2 = 3$\n求特征向量：\n当 $\\lambda_1 = 1$ 时:\n$(\\lambda I - A)x = 0$，即 $\\begin{pmatrix}-1 & -1 \\\\-1 & -1\\end{pmatrix}\\begin{pmatrix}x_1 \\\\x_2\\end{pmatrix} = \\begin{pmatrix}0 \\\\0\\end{pmatrix}$\n得 $-x_1 - x_2 = 0$，即 $x_1 = -x_2$\n令 $x_2 = k$，则 $x_1 = -k$，特征向量为 $k(1, -1)^T (k \\neq 0)$\n当 $\\lambda_2 = 3$ 时:\n$(\\lambda I - A)x = 0$，即 $\\begin{pmatrix}1 & -1 \\\\-1 & 1\\end{pmatrix}\\begin{pmatrix}x_1 \\\\x_2\\end{pmatrix} = \\begin{pmatrix}0 \\\\0\\end{pmatrix}$",
+                "final_answer_candidates": [
+                    {
+                        "text": "$\\lambda_1 = 1, \\lambda_2 = 3$",
+                        "blank_index": 1,
+                        "position_note": "特征值求解结果区域",
+                        "visual_status": "normal",
+                        "source_block_id": "block_4"
+                    },
+                    {
+                        "text": "$k(1, -1)^T\\ (k \\neq 0)$",
+                        "blank_index": 2,
+                        "position_note": "$\\lambda_1 = 1$ 对应的特征向量结果区域",
+                        "visual_status": "normal",
+                        "source_block_id": "block_8"
+                    }
+                ]
+            }
+        },
+        "evidence_risk": {
+            "risk_tags": [
+                "关键步骤遮挡",
+                "最终答案不清",
+                "公式转写存疑",
+                "关键符号存疑"
+            ],
+            "risk_locations": [
+                {
+                    "reason": "$\\lambda_2=3$ 对应的线性方程组化简区域，页面中下部被像素遮挡，OCR 只能识别到 $x_1-x_2-\\text{[unrecognizable]}$，无法确认完整化简式。",
+                    "block_id": "block_10"
+                },
+                {
+                    "reason": "$\\lambda_2=3$ 对应的特征向量结果区域，页面底部被像素严重遮挡，OCR 仅识别到零散片段 $\\text{[unrecognizable]}^T\\ \\text{[unrecognizable]}, 5)$，无法确认最终特征向量表达式。",
+                    "block_id": "block_11"
+                }
+            ],
+            "consistency_risks": [
+                "block_9 正常识别出 $\\lambda_2=3$ 的矩阵方程，但后续 block_10、block_11 大面积模糊，导致 $\\lambda_2=3$ 的化简与结论无法衔接，各步骤之间的转写一致性断裂。",
+                "final_answer_candidates 仅收录 $\\lambda_1=1$ 的特征向量，block_11 中疑似存在 $\\lambda_2=3$ 的特征向量结论却又不可读，造成候选答案列表与可见底稿之间的对应关系不确定。"
+            ],
+            "uncertain_symbols": [
+                "block_10 中 $x_1-x_2-\\text{[unrecognizable]}$ 后的等号、零向量或方程右端内容无法识别，存在缺失符号风险。",
+                "block_11 中上标 $T$ 前的向量内容、括号内坐标及条件 $k\\neq 0$ 等关键符号均无法辨认。",
+                "block_11 中孤立片段 $5)$ 来源不明，可能是误识别或卷面干扰，不能作为有效数学符号。"
+            ],
+            "final_answer_risks": [
+                "$\\lambda_2=3$ 对应的特征向量最终答案区域被像素遮挡，OCR 无法确认是否存在最终答案；虽然 final_answer_candidates 未收录，但不能据此判定学生未写出该答案。",
+                "block_11 中 $\\text{[unrecognizable]}^T\\ \\text{[unrecognizable]}, 5)$ 可能是最终特征向量表达式的碎片，但无法确认其完整形式及保留状态。"
+            ],
+            "evidence_risk_level": "high",
+            "grading_constraints": [
+                "$\\lambda_2=3$ 对应的化简步骤和特征向量结论证据不完整，评分时应以可辨认的 block_1 至 block_9 为基础；block_10、block_11 的模糊内容不得被解释为特定答案。",
+                "不得仅凭 final_answer_candidates 中没有 $\\lambda_2=3$ 的特征向量即视为缺答，也不得从 block_11 的零散符号中推断最终答案。",
+                "block_10、block_11 的高影响证据缺失属于 OCR/视觉问题，评分时需保留原图证据边界，避免将转写不确定性归因于学生作答。"
+            ]
+        },
+        "method_analysis": {
+            "method_summary": "学生采用标准特征方程法：先写出特征方程 $|\\lambda I-A|=0$，展开计算行列式得到 $(\\lambda-2)^2-1=0$，解出特征值 $\\lambda_1=1$、$\\lambda_2=3$；然后分别将各特征值代入 $(\\lambda I-A)x=0$ 求解齐次线性方程组，得到对应的特征向量。其中 $\\lambda_1=1$ 的化简和特征向量 $k(1,-1)^T\\ (k\\neq 0)$ 清晰可见，$\\lambda_2=3$ 的代入方程已写出，但后续化简与最终特征向量被遮挡无法完整确认。",
+            "method_confidence": "high",
+            "method_evidence_blocks": [
+                "block_1",
+                "block_2",
+                "block_3",
+                "block_4",
+                "block_5",
+                "block_6",
+                "block_7",
+                "block_8",
+                "block_9"
+            ]
+        },
+        "review_decision": {
+            "risk_tags": [
+                "关键步骤遮挡",
+                "最终答案不清",
+                "公式转写存疑",
+                "关键符号存疑"
+            ],
+            "review_focus": [
+                "请核对 block_10 中 $\\lambda_2=3$ 的方程组化简区域，确认被遮挡处是否为 $x_1-x_2=0$ 或等价式，并检查等号、右端零向量是否可辨认。",
+                "请核对 block_11 底部被像素遮挡的特征向量区域，确认是否存在 $\\lambda_2=3$ 对应的特征向量 $k(1,1)^T\\ (k\\neq 0)$ 及其完整表达式。",
+                "请判断 block_11 中 $\\text{[unrecognizable]}^T\\ \\text{[unrecognizable]}, 5)$ 是否为学生笔迹碎片或卷面干扰，不要把模糊内容直接解释为有效数学符号。"
+            ],
+            "evidence_safe": false,
+            "review_advice": "required_review",
+            "decision_reason": "当前证据存在高影响 OCR/视觉风险：block_10、block_11 分别对应 $\\lambda_2=3$ 的化简步骤和最终特征向量区域，均被像素遮挡，OCR 只能识别到不完整片段。由于 $\\lambda_2=3$ 的特征向量是否写出、化简是否完整直接影响关键给分证据，且无法确认最终答案是否被漏识别，有必要请教师结合原图人工核对。",
+            "confidence_level": "low",
+            "policy_overrides": []
+        }
+    },
+    "stage_results": [
+        {
+            "status": "success",
+            "model_name": "doubao-seed-2-0-lite-260215",
+            "stage_type": "visual_ocr",
+            "prompt_name": "visual_ocr",
+            "error_message": "",
+            "prompt_version": "v2",
+            "raw_output_path": ""
+        },
+        {
+            "status": "success",
+            "model_name": "deepseek-v4-flash",
+            "stage_type": "evidence_risk",
+            "prompt_name": "evidence_risk",
+            "error_message": "",
+            "prompt_version": "v2",
+            "raw_output_path": ""
+        },
+        {
+            "status": "success",
+            "model_name": "deepseek-v4-flash",
+            "stage_type": "method_analysis",
+            "prompt_name": "method_analysis",
+            "error_message": "",
+            "prompt_version": "v2",
+            "raw_output_path": ""
+        },
+        {
+            "status": "success",
+            "model_name": "deepseek-v4-flash",
+            "stage_type": "scoring",
+            "prompt_name": "scoring",
+            "error_message": "",
+            "prompt_version": "v2.3",
+            "raw_output_path": ""
+        },
+        {
+            "status": "success",
+            "model_name": "deepseek-v4-flash",
+            "stage_type": "review_decision",
+            "prompt_name": "review_decision",
+            "error_message": "",
+            "prompt_version": "v2",
+            "raw_output_path": ""
+        }
+    ],
+    "answer_item_id": "exam-93-1",
+    "suggested_score": 3.0,
+    "confidence_level": "low"
+}

@@ -1,0 +1,37 @@
+{
+  "answer_item_id": "answer_demo_001",
+  "status": "success",
+  "suggested_score": 2.0,
+  "max_score": 2.0,
+  "final_score": 2.0,
+  "question_type": "calculation",
+  "selected_path_id": null,
+  "summary": "AI 批改总结文本",
+  "score_points": [
+    {
+      "point_id": "p1",
+      "score": 1,
+      "rationale": "学生答案满足输入 rubric 中 id=p1 的评分要求。"
+    },
+    {
+      "point_id": "p2",
+      "score": 1,
+      "rationale": "学生答案满足输入 rubric 中 id=p2 的评分要求。"
+    }
+  ],
+  "deductions": [],
+  "confidence_level": "high",
+  "review_advice": "auto_accept",
+  "risk_tags": [],
+  "review_focus": [],
+  "evidence_safe": true,
+  "stage_outputs": {
+    "visual_ocr": {},
+    "evidence_risk": {},
+    "method_analysis": {},
+    "scoring": {},
+    "review_decision": {}
+  },
+  "stage_results": [],
+  "error": null
+}

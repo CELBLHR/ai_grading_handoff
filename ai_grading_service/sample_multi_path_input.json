@@ -1,0 +1,66 @@
+{
+  "project_id": "external_project_demo",
+  "task_id": "external_task_multi_path",
+  "pipeline_run_id": "external_run_multi_path",
+  "answer_item_id": "answer_multi_path_001",
+  "student": {
+    "student_id": "student_demo_001",
+    "student_no": "20260001",
+    "name": "张三"
+  },
+  "question": {
+    "question_id": "question_multi_path_001",
+    "question_no": "1",
+    "question_type": "proof",
+    "stem": "证明调和级数发散。",
+    "standard_answer": "可使用部分和分组估计或柯西收敛准则证明。",
+    "max_score": 6,
+    "rubric": {
+      "type": "proof",
+      "scoring_paths": [
+        {
+          "id": "grouped_partial_sums",
+          "name": "部分和分组估计",
+          "reference_solution": "将部分和按区间分组，证明部分和序列无上界。",
+          "applicability": "学生通过部分和分组或等价下界估计证明发散。",
+          "points": [
+            {
+              "id": "grouping_setup",
+              "description": "正确建立部分和分组估计。",
+              "score": 3
+            },
+            {
+              "id": "grouping_conclusion",
+              "description": "由部分和无上界正确推出级数发散。",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "id": "cauchy_criterion",
+          "name": "柯西收敛准则",
+          "reference_solution": "构造不趋于零的尾和，说明级数不满足柯西条件。",
+          "applicability": "学生使用柯西收敛准则或等价尾和论证。",
+          "points": [
+            {
+              "id": "cauchy_tail",
+              "description": "正确构造并估计一段尾和。",
+              "score": 3
+            },
+            {
+              "id": "cauchy_conclusion",
+              "description": "正确说明不满足柯西条件并推出发散。",
+              "score": 3
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "student_answer": {
+    "image_path": "",
+    "image_url": "",
+    "ocr_text": "",
+    "text": "按区间分组可得 $S_{2^n}\\geq 1+\\frac{n}{2}$，因此部分和序列无上界，所以调和级数发散。"
+  }
+}

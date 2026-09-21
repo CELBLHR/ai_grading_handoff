@@ -1,0 +1,42 @@
+{
+    "student": {
+        "student_no": "student_001",
+        "student_name": "王同学"
+    },
+    "task_id": "14",
+    "question": {
+        "stem": "设矩阵 $A = \\begin{pmatrix} 2 & 1 \\\\ 1 & 2 \\end{pmatrix}$，求 $A$ 的全部特征值及对应的特征向量，并写出计算过程。",
+        "rubric": {
+            "type": "calculation",
+            "scoring_points": [
+                {
+                    "id": "0",
+                    "score": 3,
+                    "description": "写出特征方程 $|\\lambda I - A| = 0$，并正确计算行列式得到 $(\\lambda - 1)(\\lambda - 3) = 0$"
+                },
+                {
+                    "id": "1",
+                    "score": 4,
+                    "description": "分别将 $\\lambda = 1$ 和 $\\lambda = 3$ 代入 $(\\lambda I - A)x = 0$，并正确化简方程"
+                },
+                {
+                    "id": "2",
+                    "score": 3,
+                    "description": "正确写出对应的特征向量形式"
+                }
+            ]
+        },
+        "max_score": 10.0,
+        "question_id": "77",
+        "question_no": "2",
+        "question_type": "calculation",
+        "standard_answer": "$\\lambda_1 = 1$，对应特征向量 $k(1, -1)^T$（$k \\neq 0$）；$\\lambda_2 = 3$，对应特征向量 $k(1, 1)^T$（$k \\neq 0$）。"
+    },
+    "project_id": "exam_marking",
+    "answer_item_id": "exam-93-1",
+    "student_answer": {
+        "ocr_text": "",
+        "image_path": "C:\\Users\\zzkk0\\AppData\\Local\\Temp\\tmpnh3th2rw.png"
+    },
+    "pipeline_run_id": "60"
+}

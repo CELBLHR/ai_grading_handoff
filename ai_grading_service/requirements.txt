@@ -1,0 +1,2 @@
+# 第一版方法包不依赖 FastAPI、Django 或第三方 SDK。
+# 当前实现只使用 Python 标准库发起 OpenAI-compatible HTTP 请求。

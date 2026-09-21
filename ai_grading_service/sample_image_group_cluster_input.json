@@ -1,0 +1,58 @@
+{
+  "project_id": "project_001",
+  "run_id": "question_17_method_cluster",
+  "question": {
+    "question_id": "question_17",
+    "question_no": "17",
+    "question_type": "proof",
+    "stem": "证明调和级数发散。",
+    "standard_answer": "可以使用部分和分组估计或柯西收敛准则证明。",
+    "max_score": 6,
+    "rubric": {
+      "type": "proof",
+      "scoring_paths": [
+        {
+          "id": "grouped_partial_sums",
+          "name": "部分和分组估计",
+          "points": [
+            {"id": "grouping_setup", "description": "正确建立分组估计。", "score": 3},
+            {"id": "grouping_conclusion", "description": "正确推出级数发散。", "score": 3}
+          ]
+        }
+      ]
+    }
+  },
+  "current_rubric": {
+    "type": "proof",
+    "scoring_paths": [
+      {
+        "id": "grouped_partial_sums",
+        "name": "部分和分组估计",
+        "points": [
+          {"id": "grouping_setup", "description": "正确建立分组估计。", "score": 3},
+          {"id": "grouping_conclusion", "description": "正确推出级数发散。", "score": 3}
+        ]
+      }
+    ]
+  },
+  "threshold": {
+    "min_cluster_count": 2
+  },
+  "answers": [
+    {
+      "answer_item_id": "answer_001",
+      "student": {"student_no": "20260001", "name": "学生一"},
+      "image_path": "replace_with_real_path/answer_001.jpg"
+    },
+    {
+      "answer_item_id": "answer_002",
+      "student": {"student_no": "20260002", "name": "学生二"},
+      "image_path": "replace_with_real_path/answer_002.jpg"
+    },
+    {
+      "answer_item_id": "answer_003",
+      "student": {"student_no": "20260003", "name": "学生三"},
+      "image_url": "https://example.com/answer_003.jpg"
+    }
+  ]
+}

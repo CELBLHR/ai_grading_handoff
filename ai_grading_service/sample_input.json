@@ -1,0 +1,40 @@
+{
+  "project_id": "external_project_demo",
+  "task_id": "external_task_demo",
+  "pipeline_run_id": "external_run_demo",
+  "answer_item_id": "answer_demo_001",
+  "student": {
+    "student_id": "student_demo_001",
+    "student_no": "20260001",
+    "name": "张三"
+  },
+  "question": {
+    "question_id": "question_demo_001",
+    "question_no": "1",
+    "question_type": "calculation",
+    "stem": "计算 1 + 1 的结果，并写出过程。",
+    "standard_answer": "1 + 1 = 2",
+    "max_score": 2,
+    "rubric": {
+      "type": "calculation",
+      "scoring_points": [
+        {
+          "id": "p1",
+          "description": "写出正确计算过程",
+          "score": 1
+        },
+        {
+          "id": "p2",
+          "description": "得到正确答案 2",
+          "score": 1
+        }
+      ]
+    }
+  },
+  "student_answer": {
+    "image_path": "",
+    "image_url": "",
+    "ocr_text": "",
+    "text": "1 + 1 = 2"
+  }
+}

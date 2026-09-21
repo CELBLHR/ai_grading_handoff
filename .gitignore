@@ -1,0 +1,33 @@
+# 本仓库只保存可交付源码；模型密钥、实验数据和运行结果由本地平台环境提供。
+.env
+.env.*
+!.env.example
+
+# Python 缓存与测试产物。
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 本地虚拟环境。
+.venv/
+venv/
+env/
+
+# 实验数据、模型输出、数据库、日志和交付压缩包不进入源码历史。
+data/
+outputs/
+reports/
+*.db
+*.sqlite
+*.sqlite3
+*.log
+*.zip
+
+# 编辑器和操作系统临时文件。
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
